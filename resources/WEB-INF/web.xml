@@ -1,0 +1,75 @@
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
+    <distributable/>
+    <listener>
+        <listener-class>org.projectodd.wunderboss.wildfly.ServletListener</listener-class>
+    </listener>
+
+    <!-- Anyone -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>test</web-resource-name>
+            <url-pattern>/test</url-pattern>
+            <url-pattern>/test/*</url-pattern>
+        </web-resource-collection>
+    </security-constraint>
+
+    <!-- Users and Admins -->
+    <security-constraint>
+        <auth-constraint>
+            <role-name>user</role-name>
+            <role-name>admin</role-name>
+        </auth-constraint>
+        <web-resource-collection>
+            <web-resource-name>backchannel</web-resource-name>
+            <url-pattern>/backchannel</url-pattern>
+            <!-- Wildcard. Covers /locked/foo, /locked/foo/bar, etc -->
+            <url-pattern>/backchannel/*</url-pattern>
+        </web-resource-collection>
+    </security-constraint>
+    
+    <!-- Users and Admins -->
+    <security-constraint>
+        <auth-constraint>
+            <role-name>user</role-name>
+            <role-name>admin</role-name>
+        </auth-constraint>
+        <web-resource-collection>
+            <web-resource-name>locked</web-resource-name>
+            <url-pattern>/locked</url-pattern>
+            <!-- Wildcard. Covers /locked/foo, /locked/foo/bar, etc -->
+            <url-pattern>/locked/*</url-pattern>
+        </web-resource-collection>
+    </security-constraint>
+
+    <!-- Admins -->
+    <security-constraint>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+        <web-resource-collection>
+            <web-resource-name>admin</web-resource-name>
+            <url-pattern>/admin</url-pattern>
+            <!-- Wildcard. Covers /admin/foo, /admin/foo/bar, etc -->
+            <url-pattern>/admin/*</url-pattern>
+        </web-resource-collection>
+    </security-constraint>
+
+    <!-- Logout Route -->
+    <security-constraint>
+        <auth-constraint>
+            <role-name>admin</role-name>
+            <role-name>user</role-name>
+        </auth-constraint>
+        <web-resource-collection>
+            <web-resource-name>logout</web-resource-name>
+            <url-pattern>/logout</url-pattern>
+        </web-resource-collection>
+    </security-constraint>
+
+    <!-- Keycloak conf -->
+    <login-config>
+        <auth-method>KEYCLOAK</auth-method>
+        <realm-name>master</realm-name>
+    </login-config>
+
+</web-app>

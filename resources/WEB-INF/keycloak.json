@@ -1,0 +1,11 @@
+{
+  "realm": "master",
+  "realm-public-key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZHnwRVzuIotyvATChOjKiI+fEuEqlPJIUibT8B2umaDtQo83RAe3sd+uO6o4LIJ5PGcBxv3h2E/hyweaJFJvAr3OzDFIfv3pxkExDmV2zMsInmuw+GbpTALpg//b8v/Ytuqk7mLh3QeXZZHm8WOu5TI8y8VPqFs6SigBx9LuLKQIDAQAB",
+  "auth-server-url": "http://auth:8080/auth",
+  "ssl-not-required": true,
+  "resource": "learning",
+  "credentials": {
+    "secret": "13fdc18a-568c-431e-a58b-c6de043e30f9"
+  },
+  "use-resource-role-mappings": true
+}
