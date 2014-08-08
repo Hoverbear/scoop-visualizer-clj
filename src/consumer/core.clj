@@ -22,17 +22,29 @@
         "Authorization" (str "Bearer " (.getTokenString (get-session request)))}})]
       (chesire/decode (:body data))))
 
+(defn render-page
+  "Builds the matter for a page"
+  [content]
+  (let [js ["c3.js" "d3.v3.js" "jquery-2.1.1.js" "bootstrap.js" "jasny-bootstrap.js"]
+        css ["bootstrap.css" "jasny-bootstrap.css" "font-awesome.css" "c3.css" "auxilary.css"]]
+    (hiccup/html 
+      [:html
+        [:head  
+              (for [item js] [:script {:src (str "/assets/js/" item)}])
+              (for [item css] [:link {:href (str "/assets/css/" item)}])]
+        [:body content]])))
+
 (defn home-route
   "Renders the homepage"
   [request]
-  ; TODO
-  "Hello, there!")
+  {:status 200
+   :body (hiccup/html [:h1 "Hello"])})
 
 (defn dashboard-route
   "Renders the dashboard"
   [request]
   ; TODO
-  (apply str (get-visualization-list request)))
+  (render-page [:h1 "Hello hello!"]))
 
 (defn view-route
   "Renders the view of a specified visualization"
