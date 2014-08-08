@@ -7,7 +7,9 @@
                  [org.immutant/immutant "2.x.incremental.200"]
                  [compojure "1.1.8"]
                  [cider/cider-nrepl "0.7.0-SNAPSHOT"]
-                 [clj-http "0.9.2"]]
+                 [clj-http "0.9.2"]
+                 [hiccup "1.0.5"]
+                 [cheshire "5.3.1"]]
   :repositories [["Immutant incremental builds"
                   "http://downloads.immutant.org/incremental/"]]
   :plugins [[lein-immutant "2.0.0-SNAPSHOT"]]

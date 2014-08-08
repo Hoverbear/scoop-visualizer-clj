@@ -4,68 +4,47 @@
         <listener-class>org.projectodd.wunderboss.wildfly.ServletListener</listener-class>
     </listener>
 
-    <!-- Anyone -->
+    <!-- Static Assets :: All visitors -->
     <security-constraint>
         <web-resource-collection>
-            <web-resource-name>test</web-resource-name>
-            <url-pattern>/test</url-pattern>
-            <url-pattern>/test/*</url-pattern>
-        </web-resource-collection>
-    </security-constraint>
-
-    <!-- Users and Admins -->
-    <security-constraint>
-        <auth-constraint>
-            <role-name>user</role-name>
-            <role-name>admin</role-name>
-        </auth-constraint>
-        <web-resource-collection>
-            <web-resource-name>backchannel</web-resource-name>
-            <url-pattern>/backchannel</url-pattern>
-            <!-- Wildcard. Covers /locked/foo, /locked/foo/bar, etc -->
-            <url-pattern>/backchannel/*</url-pattern>
+            <web-resource-name>assets</web-resource-name>
+            <url-pattern>/assets/*</url-pattern>
         </web-resource-collection>
     </security-constraint>
     
-    <!-- Users and Admins -->
+    <!-- Dashboard :: All users -->
     <security-constraint>
         <auth-constraint>
             <role-name>user</role-name>
-            <role-name>admin</role-name>
         </auth-constraint>
         <web-resource-collection>
-            <web-resource-name>locked</web-resource-name>
-            <url-pattern>/locked</url-pattern>
-            <!-- Wildcard. Covers /locked/foo, /locked/foo/bar, etc -->
-            <url-pattern>/locked/*</url-pattern>
+            <web-resource-name>dashboard</web-resource-name>
+            <url-pattern>/dashboard</url-pattern>
         </web-resource-collection>
     </security-constraint>
-
-    <!-- Admins -->
+    
+    <!-- View :: All users -->
     <security-constraint>
         <auth-constraint>
-            <role-name>admin</role-name>
-        </auth-constraint>
-        <web-resource-collection>
-            <web-resource-name>admin</web-resource-name>
-            <url-pattern>/admin</url-pattern>
-            <!-- Wildcard. Covers /admin/foo, /admin/foo/bar, etc -->
-            <url-pattern>/admin/*</url-pattern>
-        </web-resource-collection>
-    </security-constraint>
-
-    <!-- Logout Route -->
-    <security-constraint>
-        <auth-constraint>
-            <role-name>admin</role-name>
             <role-name>user</role-name>
         </auth-constraint>
         <web-resource-collection>
-            <web-resource-name>logout</web-resource-name>
-            <url-pattern>/logout</url-pattern>
+            <web-resource-name>view</web-resource-name>
+            <url-pattern>/view/*</url-pattern>
         </web-resource-collection>
     </security-constraint>
 
+    <!-- Report :: All users -->
+    <security-constraint>
+        <auth-constraint>
+            <role-name>user</role-name>
+        </auth-constraint>
+        <web-resource-collection>
+            <web-resource-name>report</web-resource-name>
+            <url-pattern>/report/*</url-pattern>
+        </web-resource-collection>
+    </security-constraint>
+    
     <!-- Keycloak conf -->
     <login-config>
         <auth-method>KEYCLOAK</auth-method>
