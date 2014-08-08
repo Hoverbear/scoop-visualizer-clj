@@ -20,19 +20,39 @@
   [request]
   (let [data (client/get "http://provider:8080/api/" {:headers {
         "Authorization" (str "Bearer " (.getTokenString (get-session request)))}})]
-      (chesire/decode (:body data))))
+      (chesire/parse-string (:body data) true)))
 
-(defn render-page
-  "Builds the matter for a page"
+(defn render-plain-page
+  "Builds a plain page with no sidebar"
   [content]
   (let [js ["c3.js" "d3.v3.js" "jquery-2.1.1.js" "bootstrap.js" "jasny-bootstrap.js"]
         css ["bootstrap.css" "jasny-bootstrap.css" "font-awesome.css" "c3.css" "auxilary.css"]]
     (hiccup/html 
       [:html
-        [:head  
-              (for [item js] [:script {:src (str "/assets/js/" item)}])
-              (for [item css] [:link {:href (str "/assets/css/" item)}])]
-        [:body content]])))
+        [:head
+          (for [item js] [:script {:src (str "/assets/js/" item)}])
+          (for [item css] [:link {:rel "stylesheet" :href (str "/assets/css/" item)}])]
+        [:body 
+          content]])))
+
+(defn render-page
+  "Builds a page with the sidebar"
+  [request content]
+  (render-plain-page
+    [:div.navmenu.navmenu-inverse.navmenu-fixed-left.offcanvas
+      [:a.navmenu-brand {:href "/"}]
+      [:ul.nav.navmenu-nav
+        (cons [:li 
+          [:a.navmenu-header {:href "/"}
+            [:i.fa.fa-question]
+            "Visualizations"]]
+          (for [vis (get-visualization-list request)]
+            [:a {:href (str "/view/" (:_id vis))
+                 :data-toggle "tooltip"
+                 :data-placement "right"
+                 :title (:description vis)} 
+                 (:title vis)]))]]))
+
 
 (defn home-route
   "Renders the homepage"
@@ -44,7 +64,7 @@
   "Renders the dashboard"
   [request]
   ; TODO
-  (render-page [:h1 "Hello hello!"]))
+  (render-page request [:h1 "Hello hello!"]))
 
 (defn view-route
   "Renders the view of a specified visualization"
