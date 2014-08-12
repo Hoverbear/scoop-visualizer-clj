@@ -1,4 +1,4 @@
-(defproject consumer "0.1.0-SNAPSHOT"
+(defproject visualizer "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "MPL"
@@ -13,7 +13,7 @@
   :repositories [["Immutant incremental builds"
                   "http://downloads.immutant.org/incremental/"]]
   :plugins [[lein-immutant "2.0.0-SNAPSHOT"]]
-  :main ^:skip-aot consumer.core
+  :main ^:skip-aot visualizer.core 
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
   :repl-options {:nrepl-middleware
@@ -25,7 +25,6 @@
                   cider.nrepl.middleware.stacktrace/wrap-stacktrace
                   cider.nrepl.middleware.trace/wrap-trace]}
   ; Plugin configuration.
-  :ring {:handler learning.core/app}
   :immutant {
      :war {
         :dev? false

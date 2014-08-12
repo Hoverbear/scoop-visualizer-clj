@@ -15,4 +15,4 @@ RUN /opt/wildfly/bin/add-user.sh admin hunter2 --silent
 #    zip /opt/wildfly/standalone/deployments/ROOT.war WEB-INF/*
 
 
-ADD target/base+system+user+dev/consumer.war /opt/wildfly/standalone/deployments/ROOT.war
+ADD target/base+system+user+dev/visualizer.war /opt/wildfly/standalone/deployments/ROOT.war
