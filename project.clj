@@ -9,6 +9,8 @@
                  [cider/cider-nrepl "0.7.0-SNAPSHOT"]
                  [clj-http "0.9.2"]
                  [hiccup "1.0.5"]
+                 [com.novemberain/monger "2.0.0" :exclusions [com.google.guava/guava]]
+                 [com.google.guava/guava "16.0.1"]
                  [cheshire "5.3.1"]]
   :repositories [["Immutant incremental builds"
                   "http://downloads.immutant.org/incremental/"]]

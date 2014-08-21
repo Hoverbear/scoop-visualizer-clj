@@ -5,4 +5,4 @@ all:
 		docker build -t visualizer .
 
 run:
-	docker run --name visualizer --rm -t -i -p 127.0.0.1:8081:8080 -p 127.0.0.1:9991:9990 -p 127.0.0.1:8888:8888 --link keycloak:auth --link provider:provider visualizer 
+	docker run --name visualizer --rm -t -i -h visualizer.scoop.local -p 127.0.0.1:9991:9990 -p 127.0.0.1:8888:8888 --link auth:auth.scoop.local --link provier:provider.scoop.local visualizer 

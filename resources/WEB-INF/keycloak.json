@@ -1,11 +1,11 @@
 {
-  "realm": "master",
-  "realm-public-key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZHnwRVzuIotyvATChOjKiI+fEuEqlPJIUibT8B2umaDtQo83RAe3sd+uO6o4LIJ5PGcBxv3h2E/hyweaJFJvAr3OzDFIfv3pxkExDmV2zMsInmuw+GbpTALpg//b8v/Ytuqk7mLh3QeXZZHm8WOu5TI8y8VPqFs6SigBx9LuLKQIDAQAB",
-  "auth-server-url": "http://auth:8080/auth",
-  "ssl-not-required": true,
-  "resource": "learning",
+  "realm": "SCOOP",
+  "realm-public-key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC2tfzg2l33ZJm1gU9esJ8bdteipxvvLRPpz2mk0J+VSAQQDuutHKsc7gLUoG3fb2IVwgF8dXWXfOdmRMBbn64ptEb+lrw1QbJBSEN8aPEK67wqhM8TnnPPZ8gTexTQX4KtsRKvnKpzslqL4GuEHc3AiCuJTvJDWaSXmHuHrRmq0QIDAQAB",
+  "auth-server-url": "http://auth.scoop.local:8080/auth",
+  "ssl-required": "external",
+  "resource": "visualizer",
   "credentials": {
-    "secret": "13fdc18a-568c-431e-a58b-c6de043e30f9"
+    "secret": "40f9153d-6121-47d6-b8c1-f8ded5a6dfe9"
   },
   "use-resource-role-mappings": true
 }

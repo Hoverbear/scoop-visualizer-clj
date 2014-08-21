@@ -12,10 +12,9 @@
         </web-resource-collection>
     </security-constraint>
     
-    <!-- Dashboard :: All users -->
     <security-constraint>
         <auth-constraint>
-            <role-name>user</role-name>
+            <role-name>access</role-name>
         </auth-constraint>
         <web-resource-collection>
             <web-resource-name>dashboard</web-resource-name>
@@ -23,10 +22,9 @@
         </web-resource-collection>
     </security-constraint>
     
-    <!-- View :: All users -->
     <security-constraint>
         <auth-constraint>
-            <role-name>user</role-name>
+            <role-name>access</role-name>
         </auth-constraint>
         <web-resource-collection>
             <web-resource-name>view</web-resource-name>
@@ -34,10 +32,9 @@
         </web-resource-collection>
     </security-constraint>
 
-    <!-- Report :: All users -->
     <security-constraint>
         <auth-constraint>
-            <role-name>user</role-name>
+            <role-name>access</role-name>
         </auth-constraint>
         <web-resource-collection>
             <web-resource-name>report</web-resource-name>
@@ -48,7 +45,7 @@
     <!-- Keycloak conf -->
     <login-config>
         <auth-method>KEYCLOAK</auth-method>
-        <realm-name>master</realm-name>
+        <realm-name>SCOOP</realm-name>
     </login-config>
 
 </web-app>
