@@ -52,8 +52,8 @@
 (defn render-plain-page
   "Builds a plain page with no sidebar"
   [& content]
-  (let [js ["c3-0.2.5.js" "d3.v3.js" "jquery-2.1.1.js" "bootstrap.js" "jasny-bootstrap.js"]
-        css ["bootstrap.css" "jasny-bootstrap.css" "font-awesome.css" "c3.css" "auxilary.css"]]
+  (let [js ["c3-0.2.5.js" "d3.v3.js" "jquery-2.1.1.js" "bootstrap.js" "jasny-bootstrap.js" "codemirror.js" "jshint.js" "mode-javascript.js" "addon-lint.js" "addon-javascript-lint.js"]
+        css ["bootstrap.css" "jasny-bootstrap.css" "font-awesome.css" "c3.css" "auxilary.css" "codemirror.css" "neo.css" "lint.css"]]
     (hiccup/html 
       [:html
        [:head
@@ -138,9 +138,29 @@
          [:div#info.tab-pane.active
           [:p [:strong "Number of Endpoints Participating: "] (count (:data query))]]
          [:div#edit.tab-pane
-          [:pre {} (chesire/generate-string visualization {:pretty true})]]
+          [:div.col-xs-12
+           [:textarea#visualization-editor (chesire/generate-string visualization {:pretty true})]
+           [:script "var visEditor; 
+                     $(document).ready(function() {
+                       visEditor = CodeMirror.fromTextArea(
+                         document.getElementById('visualization-editor'), {
+                         mode: 'javascript',
+                         lineNumbers: true,
+                         gutters: ['CodeMirror-lint-markers'],
+                         lint: true,
+                         hightlightSelectionMatches: true,
+                         matchTags: true,
+                         matchBrackets: true,
+                         hint: true
+                       });
+                       $('a[href=\"#edit\"').click(function () {
+                         setTimeout(function () {
+                           visEditor.refresh();
+                         }, 0);
+                       });
+                     });"]]]
          [:div#debug.tab-pane 
-          [:pre {} (chesire/generate-string query {:pretty true})]]]])))
+          [:div#debug-editor (chesire/generate-string query {:pretty true})]]]])))
 
 (defn report-route
   "Renders a specified report"
