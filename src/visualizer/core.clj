@@ -8,7 +8,8 @@
             [cheshire.core         :as chesire]
             [monger.core           :as monger]
             [monger.json]
-            [monger.collection     :as collections])
+            [monger.collection     :as collections]
+            [monger.operators      :refer :all])
   (:import [com.mongodb MongoOptions ServerAddress])
   (:import org.bson.types.ObjectId)
   (:gen-class))
@@ -27,7 +28,6 @@
         session (.getAttribute servlet-request "org.keycloak.KeycloakSecurityContext")]
     session))
 
-
 (defn get-query-list 
   "Retrieves the query list from the provider"
   [request]
@@ -44,7 +44,7 @@
                                     (str "Bearer " (.getTokenString (get-session request)))}})]
     (chesire/parse-string (:body data) true)))
 
-(defn get-visualization
+(defn get-visualizations
   "Pulls the visualization data for a given query ID"
   [id]
   (collections/find-one-as-map db "visualizations" {:query_id (ObjectId. id)}))
@@ -52,8 +52,10 @@
 (defn render-plain-page
   "Builds a plain page with no sidebar"
   [& content]
-  (let [js ["c3-0.2.5.js" "d3.v3.js" "jquery-2.1.1.js" "bootstrap.js" "jasny-bootstrap.js" "codemirror.js" "jshint.js" "mode-javascript.js" "addon-lint.js" "addon-javascript-lint.js"]
-        css ["bootstrap.css" "jasny-bootstrap.css" "font-awesome.css" "c3.css" "auxilary.css" "codemirror.css" "neo.css" "lint.css"]]
+  (let [js ["c3-0.2.5.js" "d3.v3.js" "jquery-2.1.1.js" "bootstrap.js" "jasny-bootstrap.js" 
+            "codemirror.js" "jshint.js" "mode-javascript.js" "addon-lint.js" "addon-javascript-lint.js"]
+        css ["bootstrap.css" "jasny-bootstrap.css" "font-awesome.css" "c3.css" "auxilary.css"
+             "codemirror.css" "neo.css" "lint.css"]]
     (hiccup/html 
       [:html
        [:head
@@ -118,7 +120,7 @@
   [request id]
   ; TODO
   (let [query (get-query request id)
-        visualization (get-visualization id)]
+        visualizations (get-visualizations id)]
     (render-page 
       request
       [:div#head.row.text-center
@@ -128,9 +130,10 @@
        [:div.panel.panel-default
         [:div.panel-body
          [:div#chart]]
-        [:script (str "var visualization = " (chesire/generate-string query) ";")]]]
+        [:script (str "var query = " (chesire/generate-string query) ";"
+                      "var visualizations = " (chesire/generate-string visualizations) ";")]]]
       [:div.row
-       [:ul.nav.nav-pills {:role "tablist"}
+       [:ul.nav.nav-tabs {:role "tablist"}
          [:li.active [:a {:href "#info", :role "tab", :data-toggle "tab"} "Info"]]
          [:li [:a {:href "#edit", :role "tab", :data-toggle "tab"} "Edit"]]
          [:li [:a {:href "#debug", :role "tab", :data-toggle "tab"} "Debug"]]]
@@ -139,26 +142,77 @@
           [:p [:strong "Number of Endpoints Participating: "] (count (:data query))]]
          [:div#edit.tab-pane
           [:div.col-xs-12
-           [:textarea#visualization-editor (chesire/generate-string visualization {:pretty true})]
-           [:script "var visEditor; 
-                     $(document).ready(function() {
-                       visEditor = CodeMirror.fromTextArea(
-                         document.getElementById('visualization-editor'), {
-                         mode: 'javascript',
-                         lineNumbers: true,
-                         gutters: ['CodeMirror-lint-markers'],
-                         lint: true,
-                         hightlightSelectionMatches: true,
-                         matchTags: true,
-                         matchBrackets: true,
-                         hint: true
-                       });
-                       $('a[href=\"#edit\"').click(function () {
-                         setTimeout(function () {
-                           visEditor.refresh();
-                         }, 0);
-                       });
-                     });"]]]
+           [:div.row
+            [:div.btn-group
+             [:button#eval.btn.btn-sm.btn-primary "Eval"]
+             [:button#new.btn.btn-sm.btn-success "New"]
+             [:button#save.btn.btn-sm.btn-info "Save"]]
+           [:select#chooser (map
+                              (fn [choice] [:option {:value (:label choice)} (:label choice)])
+                              (:choices visualizations))]]
+           [:div.row
+            [:input#label]
+            [:textarea#visualization-editor.row]
+            [:script "var visEditor; 
+                      $(document).ready(function() {
+                        visEditor = CodeMirror.fromTextArea(document.getElementById('visualization-editor'), {
+                          mode: 'javascript',
+                          lineNumbers: true,
+                          gutters: ['CodeMirror-lint-markers'],
+                          lint: true,
+                          hightlightSelectionMatches: true,
+                          matchTags: true,
+                          matchBrackets: true,
+                          hint: true
+                        });
+                        // Workaround.
+                        $('a[href=\"#edit\"').click(function () {
+                          setTimeout(function () {
+                            visEditor.refresh();
+                          }, 0);
+                        });
+
+                        $('#eval').click(function () {
+                          $('#chart').html(''); // Clear it.
+                          eval(visEditor.getValue());
+                        });  
+
+                        $('#chooser').change(function () {
+                          var label = $('#chooser').val(),
+                              code;
+                          for (var i = 0; i < visualizations.choices.length; i++) {
+                            if (visualizations.choices[i].label === label) {
+                              code = visualizations.choices[i].code;
+                            }
+                          }
+                          $('#label').val(label);
+                          visEditor.setValue(code);
+                        });
+
+                        $('#new').click(function () {
+                          visEditor.setValue('');
+                          $('#label').val('Unlabeled');
+                        });
+                         
+                        $('#save').click(function () {
+                          if ($('#label').val().length === 0) {
+                            alert('Please add a label');
+                            return;
+                          }
+                          var data = {
+                            label: $('#label').val(),
+                            code: visEditor.getValue()
+                          };
+                          $.ajax({
+                            type: 'POST',
+                            url: '/save/' + query._id,
+                            data: JSON.stringify(data),
+                            dataType: 'json',
+                            contentType: 'application/json',
+                          }).done(function () { alert('Saved!'); })
+                            .fail(function () { alert('Failed to save!'); });
+                        });
+                       });"]]]]
          [:div#debug.tab-pane 
           [:div#debug-editor (chesire/generate-string query {:pretty true})]]]])))
 
@@ -168,12 +222,43 @@
   ; TODO
   (apply str (get-query-list request)))
 
+(defn save-route
+  "Saves a labelled visualization"
+  [request id]
+  (let [parsed (chesire/decode (slurp (:body request)) true)
+        label (:label parsed)
+        code (:code parsed)
+        entry (collections/find-one-as-map db "visualizations" {:query_id id})
+        new? (not (some #(= (:label %1) label) (:choices entry)))]
+    (if entry
+      ; Existing Entry
+      (if new?
+        ; New Label
+        (do (collections/update db "visualizations" 
+                                {:query_id id},
+                                {$push {:choices {:label label,
+                                                  :code code}}})
+            {:status 200 :body "{}"}) ; Must return {} for Jquery not to fail.
+        ; Existing Label
+        (do (collections/update db "visualizations" 
+                                {:query_id id,
+                                 "choices.label" label} 
+                                {$set {"choices.$" {:label label,
+                                                    :code code}}})
+            {:status 200 :body "{}"}))
+      ; New Entry
+      (do (collections/insert db "visualizations" {:query_id id,
+                                                   :choices [{:label label,
+                                                              :code code}]})
+          {:status 200 :body "{}"}))))
+
 (defroutes app
   "The router."
   (GET "/" [:as request] (home-route request))
   (GET "/dashboard" [:as request] (dashboard-route request))
   (GET "/view/:id" [id :as request] (view-route request id))
   (GET "/report/:id" [id :as request] (report-route request id))
+  (POST "/save/:id" [id :as request] (save-route request id))
   (route/resources "/assets/")
   (route/not-found "<pre>Page not found</pre>"))
 
