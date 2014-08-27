@@ -2,7 +2,6 @@
   (:use compojure.core)
   (:require [compojure.route       :as route]
             [immutant.web          :as web]
-            [immutant.web.servlet  :as servlet]
             [clj-http.client       :as client]
             [hiccup.core           :as hiccup]
             [cheshire.core         :as chesire]
@@ -53,7 +52,8 @@
   "Builds a plain page with no sidebar"
   [& content]
   (let [js ["c3-0.2.5.js" "d3.v3.js" "jquery-2.1.1.js" "bootstrap.js" "jasny-bootstrap.js" 
-            "codemirror.js" "jshint.js" "mode-javascript.js" "addon-lint.js" "addon-javascript-lint.js"]
+            "codemirror.js" "jshint.js" "mode-javascript.js" "addon-lint.js"
+            "lodash.js" "addon-javascript-lint.js"]
         css ["bootstrap.css" "jasny-bootstrap.css" "font-awesome.css" "c3.css" "auxilary.css"
              "codemirror.css" "neo.css" "lint.css"]]
     (hiccup/html 
@@ -147,14 +147,25 @@
              [:button#eval.btn.btn-sm.btn-primary "Eval"]
              [:button#new.btn.btn-sm.btn-success "New"]
              [:button#save.btn.btn-sm.btn-info "Save"]]
-           [:select#chooser (map
-                              (fn [choice] [:option {:value (:label choice)} (:label choice)])
-                              (:choices visualizations))]]
+            [:select#chooser (map
+                               (fn [choice] [:option {:value (:label choice)} (:label choice)])
+                               (:choices visualizations))]]
            [:div.row
             [:input#label]
             [:textarea#visualization-editor.row]
             [:script "var visEditor; 
                       $(document).ready(function() {
+                        // First Open
+                        try {
+                         if (visualizations.choices.length > 0) {
+                            $('#visualization-editor').val(visualizations.choices[0].code);
+                            $('#label').val(visualizations.choices[0].label);
+                            eval($('#visualization-editor').val());
+                         }
+                        } catch (e) {
+                          $('#chart').html('<pre>No Visualizations defined.</pre>');
+                        }
+                        // Initialize CodeMirror.
                         visEditor = CodeMirror.fromTextArea(document.getElementById('visualization-editor'), {
                           mode: 'javascript',
                           lineNumbers: true,
@@ -165,8 +176,8 @@
                           matchBrackets: true,
                           hint: true
                         });
-                        // Workaround.
-                        $('a[href=\"#edit\"').click(function () {
+                        // Workaround for on-click.
+                        $('a[href=\"#edit\"]').click(function () {
                           setTimeout(function () {
                             visEditor.refresh();
                           }, 0);
@@ -214,7 +225,7 @@
                         });
                        });"]]]]
          [:div#debug.tab-pane 
-          [:div#debug-editor (chesire/generate-string query {:pretty true})]]]])))
+          [:div#debug-editor [:pre (chesire/generate-string query {:pretty true})]]]]])))
 
 (defn report-route
   "Renders a specified report"
@@ -228,26 +239,26 @@
   (let [parsed (chesire/decode (slurp (:body request)) true)
         label (:label parsed)
         code (:code parsed)
-        entry (collections/find-one-as-map db "visualizations" {:query_id id})
+        entry (collections/find-one-as-map db "visualizations" {:query_id (ObjectId. id)})
         new? (not (some #(= (:label %1) label) (:choices entry)))]
     (if entry
       ; Existing Entry
       (if new?
         ; New Label
         (do (collections/update db "visualizations" 
-                                {:query_id id},
+                                {:query_id (ObjectId. id)},
                                 {$push {:choices {:label label,
                                                   :code code}}})
             {:status 200 :body "{}"}) ; Must return {} for Jquery not to fail.
         ; Existing Label
         (do (collections/update db "visualizations" 
-                                {:query_id id,
+                                {:query_id (ObjectId. id),
                                  "choices.label" label} 
                                 {$set {"choices.$" {:label label,
                                                     :code code}}})
             {:status 200 :body "{}"}))
       ; New Entry
-      (do (collections/insert db "visualizations" {:query_id id,
+      (do (collections/insert db "visualizations" {:query_id (ObjectId. id),
                                                    :choices [{:label label,
                                                               :code code}]})
           {:status 200 :body "{}"}))))
@@ -266,4 +277,4 @@
   "Start the server"
   [& args]
   ; Start the server.
-  (web/run (servlet/create-servlet app) :port 8080))
+  (web/run app :port 8080))
