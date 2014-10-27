@@ -1,5 +1,5 @@
 FROM jboss/keycloak-adapter-wildfly
-RUN /opt/wildfly/bin/add-user.sh admin hunter2 --silent
+RUN /opt/jboss/wildfly/bin/add-user.sh admin hunter2 --silent
 
 #USER root
 #ADD . /build
@@ -15,4 +15,4 @@ RUN /opt/wildfly/bin/add-user.sh admin hunter2 --silent
 #    zip /opt/wildfly/standalone/deployments/ROOT.war WEB-INF/*
 
 
-ADD target/base+system+user+dev/visualizer.war /opt/wildfly/standalone/deployments/ROOT.war
+ADD target/base+system+user+dev/visualizer.war /opt/jboss/wildfly/standalone/deployments/ROOT.war
